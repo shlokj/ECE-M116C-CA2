@@ -49,6 +49,7 @@ public:
 	cache();
 	void controller(bool MemR, bool MemW, int* data, int adr, int* myMem);
 	// add more functions here ...	
+	Stat getStat() { return myStat; };
 };
 
 

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "cache.h"
 using namespace std;
 
@@ -77,11 +78,16 @@ int main (int argc, char* argv[]) // the program runs like this: ./program <file
 		myCache.controller (cur_MemR, cur_MemW, &cur_data, cur_adr, myMem); // in your memory controller you need to implement your FSM, LW, SW, and MM. 
 	}
 	
-	float L1_miss_rate, L2_miss_rate, AAT; 
+	double L1_miss_rate, L2_miss_rate, victim_miss_rate, AAT; 
 	//compute the stats here:
+	Stat stat = myCache.getStat();
 
+	L1_miss_rate = (stat.accL1 == 0) ? 1.0 : (double)stat.missL1 / stat.accL1;
+	victim_miss_rate = (stat.accVic == 0) ? 1.0 : (double)stat.missVic / stat.accVic;
+	L2_miss_rate = (stat.accL2 == 0) ? 1.0 : (double)stat.missL2 / stat.accL2;
 
-	cout<< "(" << L1_miss_rate<<","<<L2_miss_rate<<","<<AAT<<")"<<endl;
+	AAT = (double) (1 + (L1_miss_rate * (1 + victim_miss_rate * (8 + (L2_miss_rate * 100)))));
+	cout << "(" << setprecision(10) << L1_miss_rate << "," << setprecision(10) << L2_miss_rate << "," << setprecision(10) << AAT << ")" << endl;
 
 	// closing the file
 	fin.close();
