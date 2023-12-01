@@ -45,6 +45,12 @@ private:
 	// add more things here
 	void store(int& data, int addr, int* memory);
 	void load(int& data, int addr, int* memory);
+	bool isInVictimCache(int addr, int& idx);
+	void updateVictimCacheLRURanking_promote(int prev_idx);
+	void promoteFromVictimToL1(int victim_idx);
+	void evictFromL1AndPlaceInVictim(int idx);
+	int firstFreeSpotInVictimCache();
+	int leastRecentlyUsedIndexInVictimCache();
 public:
 	cache();
 	void controller(bool MemR, bool MemW, int* data, int adr, int* myMem);
