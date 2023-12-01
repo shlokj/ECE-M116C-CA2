@@ -39,9 +39,12 @@ private:
 	cacheBlock L1[L1_CACHE_SETS]; // 1 set per row.
 	cacheBlock L2[L2_CACHE_SETS][L2_CACHE_WAYS]; // x ways per row 
 	// Add your Victim cache here ...
+	cacheBlock victim[VICTIM_SIZE];
 	
 	Stat myStat;
 	// add more things here
+	void store(int& data, int addr, int* memory);
+	void load(int& data, int addr, int* memory);
 public:
 	cache();
 	void controller(bool MemR, bool MemW, int* data, int adr, int* myMem);
