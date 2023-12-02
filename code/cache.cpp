@@ -262,6 +262,6 @@ void cache::placeInL2(cacheBlock evicted_from_victim) { // idx for the victim ca
 	}
 	L2[l2_set_num][l2_idx_in_set].valid = true;
 	L2[l2_set_num][l2_idx_in_set].tag = l2_tag;
-	updateL2CacheLRURanking_promote(l2_set_num, l2_idx_in_set);
+	updateL2CacheLRURanking_promote(l2_set_num, l2_idx_in_set); // just like victim, make the one we just placed in L2 the MRU
 }
 
