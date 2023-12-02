@@ -18,7 +18,7 @@ struct cacheBlock
 {
 	int tag; // you need to compute offset and index to find the tag.
 	int lru_position; // for SA only
-	int data; // the actual data stored in the cache/memory
+	// int data; // the actual data stored in the cache/memory - don't need this for the project
 	bool valid;
 	// add more things here if needed
 };
@@ -48,9 +48,14 @@ private:
 	bool isInVictimCache(int addr, int& idx);
 	void updateVictimCacheLRURanking_promote(int prev_idx);
 	void promoteFromVictimToL1(int victim_idx);
-	void evictFromL1AndPlaceInVictim(int idx);
+	cacheBlock evictFromL1AndPlaceInVictim(int idx);
 	int firstFreeSpotInVictimCache();
 	int leastRecentlyUsedIndexInVictimCache();
+	bool isInL2Cache(int idx, int tag, int& wayNum);
+	void updateL2CacheLRURanking_promote(int setNum, int wayNum);
+	int firstFreeSpotInL2BySet(int setNum);
+	int leastRecentlyUsedIndexInL2BySet(int setNum);
+	void placeInL2(cacheBlock evicted_from_victim);
 public:
 	cache();
 	void controller(bool MemR, bool MemW, int* data, int adr, int* myMem);

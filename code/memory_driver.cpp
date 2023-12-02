@@ -82,10 +82,12 @@ int main (int argc, char* argv[]) // the program runs like this: ./program <file
 	//compute the stats here:
 	Stat stat = myCache.getStat();
 
-	L1_miss_rate = (stat.accL1 == 0) ? 1.0 : (double)stat.missL1 / stat.accL1;
+	// simple division to calculate miss rates; set to 1 if there was no access at that level
+	L1_miss_rate = (stat.accL1 == 0) ? 1.0 : (double)stat.missL1 / stat.accL1; // we actually don't need the check for 0 here because accL1 would be 0 only in the case of an empty program
 	victim_miss_rate = (stat.accVic == 0) ? 1.0 : (double)stat.missVic / stat.accVic;
 	L2_miss_rate = (stat.accL2 == 0) ? 1.0 : (double)stat.missL2 / stat.accL2;
 
+	// use the standard formula for AAT
 	AAT = (double) (1 + (L1_miss_rate * (1 + victim_miss_rate * (8 + (L2_miss_rate * 100)))));
 	cout << "(" << setprecision(10) << L1_miss_rate << "," << setprecision(10) << L2_miss_rate << "," << setprecision(10) << AAT << ")" << endl;
 
