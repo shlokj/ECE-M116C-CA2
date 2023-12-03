@@ -43,6 +43,9 @@ void cache::controller(bool MemR, bool MemW, int* data, int adr, int* myMem)
 
 }
 
+// simulate writing to memory: first check L1, then victim, then L2, and finally memory.
+// unlike in load, we only need to update LRU ranking where applicable but we don't need to change levels
+// (e.g. a block found in victim cache will not be moved to L1 on store, but its tag will be updated and it will become the MRU)
 void cache::store(int& data, int addr, int* memory) {
 	// cout << "================= found a store =================" << endl;
 	// cout << "data: " << data << " addr: " << addr << endl;
@@ -73,6 +76,8 @@ void cache::store(int& data, int addr, int* memory) {
 	// cout << "================= end store =================" << endl;
 }
 
+// simulates loading 4 bytes: first check L1, then victim, then L2, and finally memory.
+// if a block is found anywhere outside L1 cache, bring it to L1 and push down other blocks if we need to
 void cache::load(int& data, int addr, int* memory) {
 	// cout << "================= found a load =================" << endl;
 	// cout << "data: " << data << " addr: " << addr << endl;
@@ -87,7 +92,7 @@ void cache::load(int& data, int addr, int* memory) {
 
 	// cout << "idx: " << idx << " tag: " << tag << endl;
 
-	if (L1[idx].valid && L1[idx].tag == tag) {
+	if (L1[idx].valid && L1[idx].tag == tag) { // if we found it in L1, do nothing, because we've already incremented accL1 and don't need to go further
 		// cout << "HIT in L1 cache" << endl;
 	}
 	else {
@@ -127,6 +132,7 @@ void cache::load(int& data, int addr, int* memory) {
 						placeInL2(evicted_from_victim);
 					}
 				}
+				// finally, place the tag in L1
 				L1[idx].valid = true;
 				L1[idx].tag = tag;				
 			}
@@ -141,17 +147,17 @@ bool cache::isInVictimCache(int addr, int& idx) {
 	// iteratively search for the tag in the victim cache
 	for (int i = 0; i < VICTIM_SIZE; i++) {
 		if (victim[i].valid && victim[i].tag == tag) {
-			idx = i;
+			idx = i; // set idx, which was passed by reference
 			return true;
 		}
 	}
 	return false;
 }
 
-bool cache::isInL2Cache(int setNum, int tag, int& wayNum) { // check only the set at setNum. similae to isInVictimCache
+bool cache::isInL2Cache(int setNum, int tag, int& wayNum) { // check only the set at setNum. similar to isInVictimCache
 	for(int i = 0; i < L2_CACHE_WAYS; ++i) {
 		if (L2[setNum][i].valid && L2[setNum][i].tag == tag) {
-			wayNum = i;
+			wayNum = i; // set wayNum, which was passed by reference
 			return true;
 		}
 	}
@@ -232,12 +238,12 @@ cacheBlock cache::evictFromL1AndPlaceInVictim(int idx) { // returns the cache bl
 	victim[victim_idx].tag = victim_tag;
 	updateVictimCacheLRURanking_promote(victim_idx); // make the block we just placed the most recently used
 	L1[idx].valid = false; // free the L1 block
-	return evicted_from_victim;
+	return evicted_from_victim; // return the block since we need to place it in L2
 }
 
 int cache::firstFreeSpotInL2BySet(int setNum) {
 	for (int i = 0; i < L2_CACHE_WAYS; i++) {
-		if (!L2[setNum][i].valid) {
+		if (!L2[setNum][i].valid) { // fix the setNum and go through all ways in this set
 			return i;
 		}
 	}
@@ -246,7 +252,7 @@ int cache::firstFreeSpotInL2BySet(int setNum) {
 
 int cache::leastRecentlyUsedIndexInL2BySet(int setNum) { // assumes that all victim cache blocks are valid/occupied
 	for (int i = 0; i < L2_CACHE_WAYS; i++) {
-		if (L2[setNum][i].lru_position == 0) {
+		if (L2[setNum][i].lru_position == 0) { // fix the setNum and go through all ways in this set
 			return i;
 		}
 	}

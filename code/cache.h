@@ -18,7 +18,7 @@ struct cacheBlock
 {
 	int tag; // you need to compute offset and index to find the tag.
 	int lru_position; // for SA only
-	// int data; // the actual data stored in the cache/memory - don't need this for the project
+	// int data; // the actual data stored in the cache/memory - don't need this for this project
 	bool valid;
 	// add more things here if needed
 };
@@ -43,6 +43,7 @@ private:
 	
 	Stat myStat;
 	// add more things here
+	// the self-documenting function names below describe their purpose
 	void store(int& data, int addr, int* memory);
 	void load(int& data, int addr, int* memory);
 	bool isInVictimCache(int addr, int& idx);

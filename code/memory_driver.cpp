@@ -89,6 +89,7 @@ int main (int argc, char* argv[]) // the program runs like this: ./program <file
 
 	// use the standard formula for AAT
 	AAT = (double) (1 + (L1_miss_rate * (1 + victim_miss_rate * (8 + (L2_miss_rate * 100)))));
+	// need to change the precision of the values we output
 	cout << "(" << setprecision(10) << L1_miss_rate << "," << setprecision(10) << L2_miss_rate << "," << setprecision(10) << AAT << ")" << endl;
 
 	// closing the file
